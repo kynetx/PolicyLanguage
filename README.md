@@ -76,8 +76,6 @@ The last one is likely a global policy that the user might override or customize
 Any channel with relationship type +friend allows cloudos:{notification|subscription|deletion} events
 ```
 
-So, there are my thoughts for today. 
-
 ## Build Tools
 
 The grammar is written in ANTLR. 
