@@ -15,8 +15,8 @@ grammar PersonalChannelPolicy;
 policy 	:	policy_expr+;
 
 policy_expr 
-	:	 policy_stmt ';' NEWLINE {System.out.println($policy_stmt.value);}
-			| NEWLINE;
+	:	 policy_stmt ';'  {System.out.println($policy_stmt.value);};
+			
 policy_stmt returns [String value]
 	:	CLOUD cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id IF  condition  {
 			memory.put("cloud_id" , $cloud_id.text); 
@@ -40,7 +40,7 @@ condition :
 		CHANNEL RELATIONSHIP  IS NOT IN channel_relationship_id_list |
 		EVENT ATTRIBUTE event_attr_name MATCHES event_attr_value_regex;
 
-cloud_id : ALL | iname | inumber ;
+cloud_id : ALL | iname | inumber;
 
 allow_or_block : (ALLOWS|BLOCKS);
 //channel_relationship_id : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS)+;
@@ -60,33 +60,18 @@ event_type : ID ;
 event_type_list : '{' event_type (',' event_type)* '}';
  
 
-event_filter : 	 event_expr ;
-event_expr 
-	: ALL |	 event_domain ':'  (event_type | event_type_list) ; 
+event_filter : 	 ALL |	 event_domain ':'  (event_type | event_type_list) ; 
 	
 iname : (EQUAL|AT) inameseg ;
-//inameseg : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE|DIGIT|SEPARATOR_I)+ ;
 inameseg : ID ('*' ID)* ;
 inumber : '=!' inumberseg ('!' inumberseg)* ;
 inumberseg : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|DIGIT)+;
-/*
-cloud_id_regex 
-	:	 '/' (UPPERCASE_LETTERS)* | (LOWERCASE_LETTERS)* | (PLUS|UNDERSCORE|DIGIT|SEPARATOR_I|QUESTION_MARK|ESCAPE_CHAR|LEFT_PAREN|RIGHT_PAREN|EQUAL)* '/';
 
-*/
 cloud_id_regex 
 	:	 '/' cloud_id '/';
-/*
-event_attr_value_regex 
-	:	 '/' (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE|DIGIT|SEPARATOR_I|QUESTION_MARK|ESCAPE_CHAR|LEFT_PAREN|RIGHT_PAREN)+ '/';
 
-*/
 event_attr_value_regex 
 	:	 '/' ID '/';
-
-/*
-event_attr_name : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE)+ ;	
-*/
 
 event_attr_name : ID ;	
 
@@ -129,18 +114,15 @@ IF : 'if';
 FROM 	:	 'from';
 BELONGS_TO :	 'belongs to';
 ALL 	:	 'all';
-SEPARATOR_I 
-	:	 '*';
+SEPARATOR_I 	:	 '*';
 WS: (' '|'\n'|'\r')+ {$channel=HIDDEN;} ; // ignore whitespace
 
 MATCHES :	 'matches';
-QUESTION_MARK 
-	:	 '?';
+QUESTION_MARK 	:	 '?';
 LEFT_PAREN : '(';
 RIGHT_PAREN : ')';
 
-ESCAPE_CHAR 
-	:	 '\\';
+ESCAPE_CHAR 	:	 '\\';
 EVENT : 'event';
 ATTRIBUTE : 'attribute';
 ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
