@@ -18,14 +18,14 @@ policy_expr
 	:	 policy_stmt ';' NEWLINE {System.out.println($policy_stmt.value);}
 			| NEWLINE;
 policy_stmt returns [String value]
-	:	CLOUD IDENTIFIER cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id IF  condition  {
+	:	CLOUD cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id IF  condition  {
 			memory.put("cloud_id" , $cloud_id.text); 
 			memory.put("allow_or_block" , $allow_or_block.text);
 			memory.put("channel_id" , $channel_id.text);
 		  } 
 		| CHANNEL channel_id BELONGS_TO CLOUD IDENTIFIER cloud_id   
-		| CLOUD IDENTIFIER cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id 
-		| CLOUD IDENTIFIER cloud_id allow_or_block event_filter EVENTS IF  condition; 
+		| CLOUD cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id 
+		| CLOUD cloud_id allow_or_block event_filter EVENTS IF  condition; 
 		
 
 condition :	
