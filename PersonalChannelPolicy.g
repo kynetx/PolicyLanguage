@@ -42,8 +42,7 @@ condition :
 
 cloud_id : ALL | iname | inumber ;
 
-allow_or_block 
-	:	 (ALLOWS|BLOCKS);
+allow_or_block : (ALLOWS|BLOCKS);
 //channel_relationship_id : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS)+;
 channel_relationship_id : PLUS ID (PLUS ID)* ;
 
@@ -52,26 +51,19 @@ channel_relationship_id_list : '[' channel_relationship_id ( ',' channel_relatio
 
 cloud_id_list : '[' cloud_id (',' (iname|inumber))* ']' ; 
 
-/*
-
-channel_id : ALL |  (UPPERCASE_LETTERS|LOWERCASE_LETTERS|HYPHEN|UNDERSCORE|BANG|EQUAL)+;
-*/
 
 channel_id : ALL |  iname | inumber ;
 
-event_type_list : '[' event_type ('|' event_type)* ']';
-
-/*
-event_domain : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE)+ ;
-event_type : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE)+ ;
-*/
 
 event_domain : ID ; 
-event_type : ID ; 
+event_type : ID ;
+event_type_list : '{' event_type (',' event_type)* '}';
+ 
 
 event_filter : 	 event_expr ;
 event_expr 
-	: ALL |	 event_domain ':'  event_type_list ; 
+	: ALL |	 event_domain ':'  (event_type | event_type_list) ; 
+	
 iname : (EQUAL|AT) inameseg ;
 //inameseg : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS|UNDERSCORE|DIGIT|SEPARATOR_I)+ ;
 inameseg : ID ('*' ID)* ;
@@ -151,4 +143,4 @@ ESCAPE_CHAR
 	:	 '\\';
 EVENT : 'event';
 ATTRIBUTE : 'attribute';
-ID	: ('a'..'z' |'A'..'Z')+ ;
+ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
