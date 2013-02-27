@@ -8,7 +8,7 @@ We will start with a simpler language that creates link contracts for controllin
 
 ## Docs
 
-* [docs/OriginalPlan.md]
+* [Original Plan](docs/OriginalPlan.md)
 
 ## Build Tools
 
