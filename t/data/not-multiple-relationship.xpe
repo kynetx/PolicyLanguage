@@ -1,0 +1,1 @@
+cloud =!234 allows cloudos:{subscribe, unsubscribe} events on channel =!23 if channel relationship is not in [+friend, +relative];

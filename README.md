@@ -6,6 +6,8 @@ The goal of this project is to create a fully featured policy expression languag
 
 We will start with a simpler language that creates link contracts for controlling messages on personal channels. 
 
+See the [wiki](wiki) for more information. 
+
 ## Docs
 
 * [Original Plan](docs/OriginalPlan.md)

@@ -18,32 +18,47 @@ policy_expr
 	:	 policy_stmt ';'  {System.out.println($policy_stmt.value);};
 			
 policy_stmt returns [String value]
-	:	CLOUD cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id IF  condition  {
-			memory.put("cloud_id" , $cloud_id.text); 
-			memory.put("allow_or_block" , $allow_or_block.text);
+	: cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  {
+			memory.put("cloud_id" , $cloud_id_expr.text); 
+			memory.put("effect" , $effect.text);
 			memory.put("channel_id" , $channel_id.text);
 		  } 
-		| CHANNEL channel_id BELONGS_TO CLOUD IDENTIFIER cloud_id   
-		| CLOUD cloud_id allow_or_block event_filter EVENTS  ON CHANNEL channel_id 
-		| CLOUD cloud_id allow_or_block event_filter EVENTS IF  condition; 
+	| channel_id_expr BELONGS_TO cloud_id_expr
+	; 
 		
 
-condition :	
-		FROM  CLOUD IDENTIFIER IS cloud_id |
-		FROM  CLOUD IDENTIFIER IS NOT cloud_id |
-		FROM  CLOUD IDENTIFIER MATCHES cloud_id_regex |
-		FROM  CLOUD IDENTIFIER  IS IN cloud_id_list |
-		FROM  CLOUD IDENTIFIER  IS NOT IN cloud_id_list |
-		CHANNEL RELATIONSHIP IS channel_relationship_id |
-		CHANNEL RELATIONSHIP IS NOT channel_relationship_id |
-		CHANNEL RELATIONSHIP  IS IN channel_relationship_id_list |
-		CHANNEL RELATIONSHIP  IS NOT IN channel_relationship_id_list |
-		EVENT ATTRIBUTE event_attr_name MATCHES event_attr_value_regex;
+condition 
+	:	relationship_expr 
+	|	from_expr
+	|	attribute_expr
+	;
+	
+from_expr
+	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list)
+	|	FROM CLOUD IDENTIFIER IS NOT? (cloud_id | IN cloud_id_list)
+	|	FROM CLOUD IDENTIFIER MATCHES cloud_id_regex 
+	;
 
-cloud_id : ALL | iname | inumber;
+	
+relationship_expr
+	:	CHANNEL RELATIONSHIP IS NOT? (channel_relationship_id | IN channel_relationship_id_list)
+	;
+		
+attribute_expr
+	:	EVENTS ATTRIBUTE event_attr_name MATCHES event_attr_value_regex
+	;
+		
+cloud_id_expr 
+	:	ALL CLOUD
+	|	CLOUD cloud_id;
 
-allow_or_block : (ALLOWS|BLOCKS);
-//channel_relationship_id : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|PLUS)+;
+cloud_id:	iname 
+	|	inumber;
+
+effect  : 	ALLOWS
+	|	BLOCKS;
+
+
 channel_relationship_id : PLUS ID (PLUS ID)* ;
 
 channel_relationship_id_list : '[' channel_relationship_id ( ',' channel_relationship_id )* ']' ; 
@@ -52,7 +67,10 @@ channel_relationship_id_list : '[' channel_relationship_id ( ',' channel_relatio
 cloud_id_list : '[' cloud_id (',' (iname|inumber))* ']' ; 
 
 
-channel_id : ALL |  iname | inumber ;
+channel_id_expr
+	:	ON? ANY CHANNEL
+	|	ON? CHANNEL channel_id;
+channel_id : iname | inumber ;
 
 
 event_domain : ID ; 
@@ -60,12 +78,16 @@ event_type : ID ;
 event_type_list : '{' event_type (',' event_type)* '}';
  
 
+event_filter_expr
+	:	event_filter EVENTS;
+	
 event_filter : 	 ALL |	 event_domain ':'  (event_type | event_type_list) ; 
 	
-iname : (EQUAL|AT) inameseg ;
-inameseg : ID ('*' ID)* ;
-inumber : '=!' inumberseg ('!' inumberseg)* ;
-inumberseg : (UPPERCASE_LETTERS|LOWERCASE_LETTERS|DIGIT)+;
+iname : (EQUAL|AT) ID ('*' ID)* ;
+
+// TODO: match XDI syntax here: https://wiki.oasis-open.org/xdi/XdiAbnf (immutable)
+inumber : '=!' inumseq ('!' inumseq)* ;
+inumseq :HEX;
 
 cloud_id_regex 
 	:	 '/' cloud_id '/';
@@ -95,11 +117,13 @@ UNDERSCORE
 HYPHEN 	:	 '-';
 
 
-CLOUD : 'cloud';
-IDENTIFIER : 'identifier';
-ALLOWS : 'allows';
-BLOCKS : 'blocks';
-EVENTS : 'events';
+CLOUD 	: 'cloud' 
+	| 'clouds';
+IDENTIFIER 	
+	: 'identifier';
+ALLOWS : 'allows' | 'allow';
+BLOCKS : 'blocks' | 'block';
+EVENTS : 'events' | 'event';
 ON : 'on';
 CHANNEL : 'channel';
 OWNS : 'owns';
@@ -114,6 +138,7 @@ IF : 'if';
 FROM 	:	 'from';
 BELONGS_TO :	 'belongs to';
 ALL 	:	 'all';
+ANY	:	'any';
 SEPARATOR_I 	:	 '*';
 WS: (' '|'\n'|'\r')+ {$channel=HIDDEN;} ; // ignore whitespace
 
@@ -123,6 +148,20 @@ LEFT_PAREN : '(';
 RIGHT_PAREN : ')';
 
 ESCAPE_CHAR 	:	 '\\';
-EVENT : 'event';
+
 ATTRIBUTE : 'attribute';
+
+HEX	: ('abcdef' | '0'..'9')+;
+
 ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+
+
+INT :	' -'? '0'..'9'+
+    ;
+
+FLOAT
+    :   ' -'? ('0'..'9')+ '.' ('0'..'9')*
+    |   ' -'? '.' ('0'..'9')*
+
+    ;
+
