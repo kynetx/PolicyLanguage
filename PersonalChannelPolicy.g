@@ -18,11 +18,12 @@ policy_expr
 	:	 policy_stmt ';'  {System.out.println($policy_stmt.value);};
 			
 policy_stmt returns [String value]
-	: cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  {
-			memory.put("cloud_id" , $cloud_id_expr.text); 
-			memory.put("effect" , $effect.text);
-			memory.put("channel_id" , $channel_id.text);
-		  } 
+	: cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  
+        	{
+		 memory.put("cloud_id" , $cloud_id_expr.text); 
+		 memory.put("effect" , $effect.text);
+ 		 memory.put("channel_id" , $channel_id.text);
+        	} 
 	| channel_id_expr BELONGS_TO cloud_id_expr
 	; 
 		
@@ -34,9 +35,7 @@ condition
 	;
 	
 from_expr
-	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list)
-	|	FROM CLOUD IDENTIFIER IS NOT? (cloud_id | IN cloud_id_list)
-	|	FROM CLOUD IDENTIFIER MATCHES cloud_id_regex 
+	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list | CLOUD LIKE regexp)
 	;
 
 	
@@ -89,7 +88,7 @@ iname : (EQUAL|AT) ID ('*' ID)* ;
 inumber : '=!' inumseq ('!' inumseq)* ;
 inumseq :HEX;
 
-cloud_id_regex 
+regexp
 	:	 '/' cloud_id '/';
 
 event_attr_value_regex 
@@ -142,7 +141,7 @@ ANY	:	'any';
 SEPARATOR_I 	:	 '*';
 WS: (' '|'\n'|'\r')+ {$channel=HIDDEN;} ; // ignore whitespace
 
-MATCHES :	 'matches';
+LIKE :	 'like';
 QUESTION_MARK 	:	 '?';
 LEFT_PAREN : '(';
 RIGHT_PAREN : ')';
