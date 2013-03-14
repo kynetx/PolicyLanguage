@@ -1,41 +1,74 @@
 grammar PersonalChannelPolicy;
+
+options {
+  output=AST;
+//  backtrack=true;
+//  memoize=true;
+//  language=C;
+//  ASTLabelType=pANTLR3_BASE_TREE;
+}
+
 @header {
+	package test;
 	import java.util.HashMap;
+	import java.util.ArrayList;
 }
+
+@lexer::header {
+	package test;
+
+}
+
+
 @members {
-	/** Map variable name to Integer object holding value */
-	HashMap memory = new HashMap();
+	public HashMap policy = new HashMap();
+	public ArrayList parse_errors = new ArrayList();
+
+	public void emitErrorMessage(String msg) {
+		parse_errors.add(msg);
+	}
 }
+
 
 
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
  
-policy 	:	policy_expr+;
+policy 	:	policy_expr+
+	;
 
 policy_expr 
-	:	 policy_stmt ';'  {System.out.println($policy_stmt.value);};
+	:	policy_stmt ';'  
+		{
+			System.out.println($policy_stmt.value);
+		}
+	;
 			
-policy_stmt returns [String value]
-	: cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  
+policy_stmt returns [String value] 
+	: 	cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  
         	{
-		 memory.put("cloud_id" , $cloud_id_expr.text); 
-		 memory.put("effect" , $effect.text);
- 		 memory.put("channel_id" , $channel_id.text);
+		 policy.put("cloud_id" , $cloud_id_expr.result);  
+		 policy.put("effect" , $effect.text);
+// 		 policy.put("channel_id" , $channel_id_expr.result);
+// 		 policy.put("condition", $condition.result);
         	} 
-	| channel_id_expr BELONGS_TO cloud_id_expr
+	| 	channel_id_expr BELONGS_TO cloud_id_expr
 	; 
 		
 
-condition 
+condition returns[HashMap result]
 	:	relationship_expr 
 	|	from_expr
 	|	attribute_expr
 	;
 	
-from_expr
+from_expr returns[HashMap result]
 	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list | CLOUD LIKE regexp)
+		{
+		 HashMap from = new HashMap();
+		 $result = from;
+		}
 	;
 
 	
@@ -44,12 +77,24 @@ relationship_expr
 	;
 		
 attribute_expr
-	:	EVENTS ATTRIBUTE event_attr_name MATCHES event_attr_value_regex
+	:	EVENTS ATTRIBUTE event_attr_name LIKE event_attr_value_regex
 	;
 		
-cloud_id_expr 
+cloud_id_expr returns[HashMap result]
 	:	ALL CLOUD
-	|	CLOUD cloud_id;
+		{
+			HashMap cid = new HashMap();
+			cid.put('id', 'all');
+		 	$result = cid; 
+		}	
+	|	CLOUD cloud_id
+		{
+			HashMap cid = new HashMap();
+			cid.put('id', $cloud_id.text);
+		 	$result = cid;
+		}
+	;
+
 
 cloud_id:	iname 
 	|	inumber;
@@ -66,9 +111,11 @@ channel_relationship_id_list : '[' channel_relationship_id ( ',' channel_relatio
 cloud_id_list : '[' cloud_id (',' (iname|inumber))* ']' ; 
 
 
-channel_id_expr
+channel_id_expr returns[HashMap result]
 	:	ON? ANY CHANNEL
-	|	ON? CHANNEL channel_id;
+	|	ON? CHANNEL channel_id
+	;
+	
 channel_id : iname | inumber ;
 
 
@@ -80,7 +127,7 @@ event_type_list : '{' event_type (',' event_type)* '}';
 event_filter_expr
 	:	event_filter EVENTS;
 	
-event_filter : 	 ALL |	 event_domain ':'  (event_type | event_type_list) ; 
+event_filter : 	 ALL |	 event_domain (':'  (event_type | event_type_list))? ; 
 	
 iname : (EQUAL|AT) ID ('*' ID)* ;
 
@@ -121,7 +168,7 @@ CLOUD 	: 'cloud'
 IDENTIFIER 	
 	: 'identifier';
 ALLOWS : 'allows' | 'allow';
-BLOCKS : 'blocks' | 'block';
+BLOCKS : 'blocks' | 'block' | 'deny' | 'denies';
 EVENTS : 'events' | 'event';
 ON : 'on';
 CHANNEL : 'channel';
