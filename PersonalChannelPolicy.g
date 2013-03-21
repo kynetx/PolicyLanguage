@@ -2,10 +2,6 @@ grammar PersonalChannelPolicy;
 
 options {
   output=AST;
-//  backtrack=true;
-//  memoize=true;
-//  language=C;
-//  ASTLabelType=pANTLR3_BASE_TREE;
 }
 
 @header {
@@ -77,7 +73,7 @@ condition returns[HashMap result]
 	;
 	
 from_expr returns[HashMap result]
-	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list | CLOUD LIKE regexp)
+	:	NOT? 'raised by' (cloud_id_expr | CLOUD IN cloud_id_list | CLOUD LIKE regex)
 	{
 		HashMap condition = new HashMap();
 		if($NOT != null) {
@@ -93,7 +89,7 @@ from_expr returns[HashMap result]
   		  condition.put("cloud_list", $cloud_id_list.result);
 		} else {
 		  condition.put("type", "raised_by_match");
-  		  condition.put("regexp", $regexp.text);
+  		  condition.put("regex", $regex.text);
 		}
 		$result = condition;
 	}
@@ -124,7 +120,8 @@ attribute_expr returns[HashMap result]
 	{
 		HashMap attribute = new HashMap();
 		attribute.put("type", "attribute");
-		attribute.
+		attribute.put("name", $event_attr_name.text);
+		attribute.put("regex", $event_attr_value_regex.text);
 		$result = attribute;
 	}
 	;
@@ -240,7 +237,7 @@ iname : (EQUAL|AT) ID ('*' ID)* ;
 inumber : '=!' inumseq ('!' inumseq)* ;
 inumseq :HEX;
 
-regexp
+regex
 	:	 '/' cloud_id '/';
 
 event_attr_value_regex 
