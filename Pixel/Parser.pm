@@ -1,7 +1,7 @@
 package Pixel::Parser;
 # file: Pixel/Parser.pm
 #
-# This file is part of the Pixel Policy Expression Languagge
+# This file is part of the Pixel Policy Expression Language
 use strict;
 #use warnings;
 use utf8;

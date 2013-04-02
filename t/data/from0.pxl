@@ -1,0 +1,2 @@
+// deny some events on a channel if from a specific cloud
+deny cloudos:unsubscribe events on channel =!345 if raised by cloud =!1212;

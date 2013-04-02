@@ -27,31 +27,36 @@ options {
 
 
 
+
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
  
-policy 	:	policy_expr+
+policy 	returns[HashMap result]
+	@init{	
+		ArrayList policy_array = new ArrayList();
+		policy.put("policy_stmts", policy_array);
+	}
+	@after {
+		System.out.println(policy);
+	}
+	:	p0 = policy_stmt { policy_array.add($p0.result);} (SEMICOLON p1 = policy_stmt { policy_array.add($p1.result);} )* SEMICOLON?
 	; 
-
-policy_expr 
-	:	policy_stmt ';'  
-		{
-			System.out.println($policy_stmt.result);
-		}
-	;
 			
-policy_stmt  returns[HashMap result]
+policy_stmt returns[HashMap result]
+	@init{
+		HashMap policy_stmt = new HashMap();
+	}
 	: 	cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  
         	{
-		 policy.put("cloud_id" , $cloud_id_expr.result);  
-		 policy.put("effect" , $effect.text);
-		 policy.put("channel_id" , $channel_id_expr.result);
-		 policy.put("event_filter", $event_filter_expr.result);
+		 policy_stmt.put("cloud_id" , $cloud_id_expr.result);  
+		 policy_stmt.put("effect" , $effect.text);
+		 policy_stmt.put("channel_id" , $channel_id_expr.result);
+		 policy_stmt.put("event_filter", $event_filter_expr.result);
 		 if($condition.result != null) {
- 		   policy.put("condition", $condition.result);
+ 		   policy_stmt.put("condition", $condition.result);
  		 }
-                 $result = policy;
+                 $result = policy_stmt;
         	} 
 	| 	channel_id_expr BELONGS_TO cloud_id_expr
 	;  
@@ -104,9 +109,10 @@ relationship_expr  returns[HashMap result]
 		   relationship.put("sense", false);
 		} else {
 		   relationship.put("sense", true);
-		}		if($channel_relationship_id.result != null) {
+		} 
+		if($channel_relationship_id.text != null) {
 		  relationship.put("type", "relationship_single");
-		  relationship.put("relationship_id", $channel_relationship_id.result);
+		  relationship.put("relationship_id", $channel_relationship_id.text);
 		} else {
 		  relationship.put("type", "relationship_list");
   		  relationship.put("relationship_list", $channel_relationship_id_list.result);
@@ -157,7 +163,8 @@ effect  : 	ALLOWS
 
 
 channel_relationship_id returns[String result]
-	:	PLUS ID (PLUS ID)* ;
+	:	PLUS ID (PLUS ID)* 
+	;
 
 channel_relationship_id_list returns[ArrayList result]
 	@init{
@@ -187,14 +194,11 @@ channel_id : iname | inumber ;
 event_domain : ID ; 
 event_type : ID ;
 event_type_list returns[ArrayList result]
-	: '{' types += event_type (',' types += event_type)* '}'
-	{
+	@init{
 		ArrayList type_array = new ArrayList();
-		if($types != null) {
-			for(int i = 0;i< $types.size();i++) {
-				type_array.add($types.get(i));
-			}
-		}
+	}
+	: '{' e0 = event_type {type_array.add($e0.text);} (',' e1 = event_type {type_array.add($e1.text);} )* '}'
+	{
 		$result = type_array;
 	}
 	;
@@ -263,6 +267,8 @@ AT	: '@';
 UNDERSCORE 
 	:	 '_';
 HYPHEN 	:	 '-';
+SEMICOLON
+	:	';';
 
 
 CLOUD 	: 'cloud' 
@@ -294,7 +300,12 @@ AUTH	: 'authenticated'
 	| 'unauthd'
 	;
 SEPARATOR_I 	:	 '*';
-WS: (' '|'\n'|'\r')+ {$channel=HIDDEN;} ; // ignore whitespace
+WS       :           (' '|'\t'|'\f'|'\n'|'\r')+{ $channel=HIDDEN; };
+COMMENT
+    :   '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    |   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    ;
+
 
 LIKE :	 'like';
 QUESTION_MARK 	:	 '?';
@@ -318,4 +329,5 @@ FLOAT
     |   ' -'? '.' ('0'..'9')*
 
     ;
+
 
