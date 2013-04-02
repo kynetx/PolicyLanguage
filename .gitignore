@@ -1,1 +1,7 @@
 output
+build
+_Inline
+parser/lib
+parser/build
+parser/perl/lib
+t/_Inline

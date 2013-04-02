@@ -1,0 +1,13 @@
+JParser_1b58.java:112: cannot find symbol
+symbol  : class RuleSetLexer
+location: package com.kynetx
+                com.kynetx.RuleSetLexer lexer = new com.kynetx.PersonalChannelPolicyLexer(input);
+                          ^
+JParser_1b58.java:114: cannot find symbol
+symbol  : class RuleSetParser
+location: package com.kynetx
+                com.kynetx.RuleSetParser parser = new com.kynetx.PersonalChannelPolicyParser(tokens);
+                          ^
+Note: JParser_1b58.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+2 errors

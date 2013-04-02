@@ -5,13 +5,13 @@ options {
 }
 
 @header {
-	package test;
+	package com.kynetx;
 	import java.util.HashMap;
 	import java.util.ArrayList;
 }
 
 @lexer::header {
-	package test;
+	package com.kynetx;
 
 }
 
@@ -32,7 +32,7 @@ options {
  *------------------------------------------------------------------*/
  
 policy 	:	policy_expr+
-	;
+	; 
 
 policy_expr 
 	:	policy_stmt ';'  
@@ -171,9 +171,9 @@ channel_relationship_id_list returns[ArrayList result]
 
 
 channel_id_expr returns[String result]
-	:	ON? ANY CHANNEL
+	:	ON? a=(ANY|AUTH) CHANNEL
 	{
-	 	$result = "all"; 
+	 	$result = $a.text; 
 	}	
 	|	ON? CHANNEL channel_id
 	{
@@ -273,7 +273,8 @@ ALLOWS : 'allows' | 'allow';
 BLOCKS : 'blocks' | 'block' | 'deny' | 'denies';
 EVENTS : 'events' | 'event';
 ON : 'on';
-CHANNEL : 'channel';
+CHANNEL : 'channel' 
+	| 'channels';
 OWNS : 'owns';
 NOT : 'not';
 AND : 'and';
@@ -287,6 +288,11 @@ FROM 	:	 'from';
 BELONGS_TO :	 'belongs to';
 ALL 	:	 'all';
 ANY	:	'any';
+AUTH	: 'authenticated' 
+	| 'authd'
+	| 'unauthenticated'
+	| 'unauthd'
+	;
 SEPARATOR_I 	:	 '*';
 WS: (' '|'\n'|'\r')+ {$channel=HIDDEN;} ; // ignore whitespace
 

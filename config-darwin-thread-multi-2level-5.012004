@@ -1,0 +1,27 @@
+version : 0.48
+languages : %
+    C : C
+    Foo : Foo
+    JAVA : Java
+    Java : Java
+    PYTHON : Python
+    Python : Python
+    foo : Foo
+    java : Java
+    py : Python
+    python : Python
+types : %
+    C : compiled
+    Foo : interpreted
+    Java : interpreted
+    Python : interpreted
+modules : %
+    C : Inline::C
+    Foo : Inline::Foo
+    Java : Inline::Java
+    Python : Inline::Python
+suffixes : %
+    C : bundle
+    Foo : foo
+    Java : jdat
+    Python : pydat
