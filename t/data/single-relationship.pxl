@@ -1,1 +1,2 @@
-cloud =!234 allows cloudos:{subscribe, unsubscribe} events on channel =!23 if channel relationship is +friend
+// a cloud allows specific events on a channel with a specific relationship
+cloud =!234 allows cloudos:{subscribe, unsubscribe} events on channel =!23 if channel relationship is +friend;

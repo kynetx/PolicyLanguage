@@ -1,2 +1,3 @@
+// all events allowed on one channel
 cloud =!234 allows all events on channel =!1111;
 

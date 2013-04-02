@@ -1,1 +1,2 @@
+// deny certain events on a channel
 deny cloudos:{subscribe, unsubscribe} events on channel =!345;

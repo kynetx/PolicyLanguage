@@ -7,12 +7,6 @@ use strict;
 # grab the test data file names
 my @pxl_files = @ARGV ? @ARGV : <data/*.pxl>;
 
-# all the files in the rules repository
-#my @pxl_files = @ARGV ? @ARGV : </web/work/pxl.kobj.net/rules/client/*.pxl>;
-
-# testing some...
-# my @pxl_files = <new/ineq[0-0].pxl>;
-#my @pxl_files = <new/*.pxl>;
 
 use Test::More;
 plan tests => $#pxl_files+1;
@@ -28,8 +22,7 @@ my $logger = get_logger();
 
 foreach my $f (@pxl_files) {
     my ($fl,$pxl_text) = getpxl($f);
-	$logger->debug("File: $f");
-
+    $logger->debug("File: $f");
     my $result = parse_pixel($pxl_text);
     ok(! defined ($result->{'error'}), "$f: $fl")
 }

@@ -42,7 +42,7 @@ BEGIN {
     }
     push @jars,$pclasses;
     $ENV{CLASSPATH} = join (":",@jars);
-    warn $ENV{CLASSPATH};
+#    warn $ENV{CLASSPATH};
 }
 
 
@@ -165,7 +165,8 @@ use Inline (Java => <<'END',
                 com.kynetx.PersonalChannelPolicyParser parser = new com.kynetx.PersonalChannelPolicyParser(tokens);
                 parser.policy();
                 HashMap map = new HashMap();
-                JSONObject js = new JSONObject(parser.policy);
+                // JSONObject js = new JSONObject(parser.policy);
+                JSONObject js = new JSONObject();
                 if (parser.parse_errors.size() > 0) {
                     ArrayList elist = new ArrayList();
                     for (int i = 0;i< parser.parse_errors.size(); i++) {

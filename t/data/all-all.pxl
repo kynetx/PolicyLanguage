@@ -1,2 +1,2 @@
-cloud =!234 allows all events on channel all;
-
+// all events on all channels
+cloud =!234 allows all events on any channel;

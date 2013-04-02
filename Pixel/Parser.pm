@@ -89,9 +89,9 @@ sub parse_pixel {
 
     #$pixel = remove_comments($pixel);
 
-    $logger->debug("[parser::parse_pixel] after comments: ", sub {Dumper($pixel)});
+    $logger->debug("[parser::parse_pixel] after comments: ", sub {$pixel});
     my $json = $parser->pixel($pixel);
-    $logger->trace("Result: ",$json);
+    $logger->debug("Result: ",$json);
     my $result;
     eval {
         $result = jsonToAst($json);
