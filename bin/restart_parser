@@ -1,0 +1,2 @@
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+(cd $DIR/../parser; ./buildparser.sh);perl -MInline::Java::Server=restart
