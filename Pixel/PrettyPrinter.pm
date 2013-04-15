@@ -34,12 +34,33 @@ sub pp {
 
   my $o = "";
 
-  if (defined $ast->{'policy_stmts'}) {
-    $o .= join(";\n", (map {pp_policy_stmt($_)} @{ $ast->{'policy_stmts'} }));
+  if (defined $ast->{'decls'}) {
+    $o .= join(";\n", (map {pp_decl($_)} @{ $ast->{'decls'} }));
+  }
+
+  if (defined $ast->{'policy'}) {
+    $o .= join(";\n", (map {pp_policy_stmt($_)} @{ $ast->{'policy'} }));
   }
 
   return $o;
 }
+
+sub pp_decl {
+  my($ast) = @_;
+
+  my $logger = get_logger();
+
+  my $o = "";
+
+  $o .= $ast->{'var'} ;
+  $o .= ' = ';
+  $o .= $ast->{'rhs'};
+  $o .= ';';
+    
+
+  return $o;
+}
+
 
 sub pp_policy_stmt {
   my($ast) = @_;

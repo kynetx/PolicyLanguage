@@ -26,8 +26,6 @@ options {
 }
 
 
-
-
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
@@ -35,14 +33,45 @@ options {
 policy 	returns[HashMap result]
 	@init{	
 		ArrayList policy_array = new ArrayList();
-		policy.put("policy_stmts", policy_array);
 	}
 	@after {
 		System.out.println(policy);
 	}
-	:	p0 = policy_stmt { policy_array.add($p0.result);} (SEMICOLON p1 = policy_stmt { policy_array.add($p1.result);} )* SEMICOLON?
+	:	d = decls? { policy.put("decls", $d.result);} p = stmts? { policy.put("policy", $p.result);} 
 	; 
+	
+decls	returns[ArrayList result]
+	@init{	
+		ArrayList decl_array = new ArrayList();
+	}
+	:	 d0 = decl { decl_array.add($d0.result);} (SEMICOLON d1 = decl { decl_array.add($d1.result);} )* SEMICOLON
+	{
+		$result = decl_array;
+	}
+	; 
+	
+decl	returns [HashMap result]
+	@init{
+		HashMap decl = new HashMap();
+	}
+	: 	var EQUAL cloud_id
+		{
+		 decl.put("var", $var.text);
+		 decl.put("rhs", $cloud_id.text);
+		 $result = decl;
+		}
+	;
 			
+stmts	returns[ArrayList result]
+	@init{	
+		ArrayList policy_array = new ArrayList();
+	}
+	:	  p0 = policy_stmt { policy_array.add($p0.result);} (SEMICOLON p1 = policy_stmt { policy_array.add($p1.result);} )* SEMICOLON?
+	{
+		$result = policy_array;
+	}
+	; 
+	
 policy_stmt returns[HashMap result]
 	@init{
 		HashMap policy_stmt = new HashMap();
@@ -58,7 +87,7 @@ policy_stmt returns[HashMap result]
  		 }
                  $result = policy_stmt;
         	} 
-	| 	channel_id_expr BELONGS_TO cloud_id_expr
+	| 	channel_id_expr BELONGS_TO cloud_id_expr	
 	;  
 		
 
@@ -156,7 +185,9 @@ cloud_id_list returns[ArrayList result]
 	
 cloud_id 
 	:	iname 
-	|	inumber;
+	|	inumber
+	|	ID
+	;
 
 effect  : 	ALLOWS
 	|	BLOCKS;
@@ -188,7 +219,7 @@ channel_id_expr returns[String result]
 	}
 	;
 	
-channel_id : iname | inumber ;
+channel_id : iname | inumber | ID;
 
 
 event_domain : ID ; 
@@ -248,6 +279,7 @@ event_attr_value_regex
 	:	 '/' ID '/';
 
 event_attr_name : ID ;	
+var	: ID;
 
 /*------------------------------------------------------------------
  * LEXER RULES
@@ -267,6 +299,7 @@ AT	: '@';
 UNDERSCORE 
 	:	 '_';
 HYPHEN 	:	 '-';
+
 SEMICOLON
 	:	';';
 
@@ -318,7 +351,8 @@ ATTRIBUTE : 'attribute';
 
 HEX	: ('abcdef' | '0'..'9')+;
 
-ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+ID	: 	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+
 
 
 INT :	' -'? '0'..'9'+
