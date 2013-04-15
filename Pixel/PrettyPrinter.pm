@@ -35,10 +35,12 @@ sub pp {
   my $o = "";
 
   if (defined $ast->{'decls'}) {
+    $o .= "decls\n";
     $o .= join(";\n", (map {pp_decl($_)} @{ $ast->{'decls'} }));
   }
 
   if (defined $ast->{'policy'}) {
+    $o .= "policy\n";
     $o .= join(";\n", (map {pp_policy_stmt($_)} @{ $ast->{'policy'} }));
   }
 

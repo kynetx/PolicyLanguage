@@ -1,2 +1,3 @@
 // deny some events on a channel
-deny cloudos events on channel =!345;
+policy 
+  deny cloudos events on channel =!345;

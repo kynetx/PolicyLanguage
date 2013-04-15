@@ -1,2 +1,3 @@
 // allow some events on a channel
-allow cloudos:{subscribe, unsubscribe} events on channel =!345;
+policy
+  allow cloudos:{subscribe, unsubscribe} events on channel =!345;

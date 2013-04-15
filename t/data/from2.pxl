@@ -1,2 +1,3 @@
 // deny some events on a channel if not from a cloud in list
-deny cloudos:unsubscribe events on channel =!345 if not raised by cloud in [=!1212, =!2323];
+policy 
+  deny cloudos:unsubscribe events on channel =!345 if not raised by cloud in [=!1212, =!2323];

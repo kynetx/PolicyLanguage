@@ -1,3 +1,4 @@
 // multiple policy lines
-cloud =!234 allows all events on any channel;
-deny cloudos:unsubscribe events on channel =!345 if raised by cloud =!1212;
+policy
+  cloud =!234 allows all events on any channel;
+  deny cloudos:unsubscribe events on channel =!345 if raised by cloud =!1212;

@@ -1,2 +1,3 @@
 // a cloud allows a specific event on all channels. 
-cloud =!234 allows cloudos:subscribe events on any channel;
+policy 
+  cloud =!234 allows cloudos:subscribe events on any channel;

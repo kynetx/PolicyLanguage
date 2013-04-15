@@ -1,2 +1,3 @@
 // multiple events on a channel with list relationship
-cloud =!234 allows cloudos:{subscribe, unsubscribe} events on channel =!23 if channel relationship is in [+friend, +relative];
+policy 
+  cloud =!234 allows cloudos:{subscribe, unsubscribe} events on channel =!23 if channel relationship is in [+friend, +relative];

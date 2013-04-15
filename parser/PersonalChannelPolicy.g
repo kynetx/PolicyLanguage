@@ -37,7 +37,7 @@ policy 	returns[HashMap result]
 	@after {
 		System.out.println(policy);
 	}
-	:	d = decls? { policy.put("decls", $d.result);} p = stmts? { policy.put("policy", $p.result);} 
+	:	(DECLS d = decls)? { policy.put("decls", $d.result);} POLICY p = stmts? { policy.put("policy", $p.result);} 
 	; 
 	
 decls	returns[ArrayList result]
@@ -304,6 +304,8 @@ SEMICOLON
 	:	';';
 
 
+DECLS	: 'decls';
+POLICY	: 'policy';
 CLOUD 	: 'cloud' 
 	| 'clouds';
 IDENTIFIER 	
