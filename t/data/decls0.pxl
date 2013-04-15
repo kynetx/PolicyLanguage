@@ -1,0 +1,6 @@
+// with a decl
+decls
+  my_cloud = =!234; 
+policy
+  cloud my_cloud allows all events on any channel;
+  deny cloudos:unsubscribe events on channel =!345 if raised by cloud =!1212;
