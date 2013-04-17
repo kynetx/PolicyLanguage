@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w 
+#
+#
+# This file is part of the Pixel Policy Expression Languagge
+# Copyright Kynetx, Inc. 2013
+
+
+use lib qw(..);
+use strict;
+use warnings;
+
+use Test::More;
+use Test::LongString;
+
+use DateTime;
+
+
+# most Kyentx modules require this
+use Log::Log4perl qw(get_logger :levels);
+Log::Log4perl->easy_init($INFO);
+#Log::Log4perl->easy_init($DEBUG);
+
+use Pixel::Test qw/:all/;
+use Pixel::<TMPL_IF NAME="MODULE_DIR"><TMPL_VAR NAME=MODULE_DIR>::</TMPL_IF><TMPL_VAR NAME=MODULE_NAME> qw/:all/;
+#use Pixel::Configure qw/:all/;
+
+
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+
+#my $r = Kynetx::Pixel::configure();
+
+
+my $test_count = 0;
+
+
+
+
+ok(1,"dummy test");
+$test_count++;
+
+
+done_testing($test_count);
+
+
+
+1;
+

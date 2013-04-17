@@ -2,6 +2,7 @@ package Pixel::JParser;
 # file: Pixel/JParser.pm
 #
 # This file is part of the Pixel Policy Expression Languagge
+# Copyright Kynetx, Inc. 2013
 use strict;
 #use warnings;
 use lib qw(..);
