@@ -6,6 +6,7 @@ use lib qw(..);
 
 use Getopt::Std;
 use HTML::Template;
+use Data::Dumper;
 
 
 # global options
@@ -23,6 +24,9 @@ if($opt{'f'}) {
 } else {
     die "You must supply a filename\n";
 }
+
+die "Don't append extension" if $filename =~ m#\.pm$#;
+
 my $module_name = $filename . ".pm";
 my $test_name = $filename . ".t";
 
@@ -31,7 +35,7 @@ my $test_name = $filename . ".t";
 # config
 
 my $base_var = 'PIXEL_ROOT';
-my $base = $ENV{$base_var} || die "$base_var is undefined in the environment";
+my $base = $ENV{$base_var} || die "$base_var is undefined in the environment; set it before using $0";
 
 my $module_dir = "Pixel";
 my $modules = $base . "/$module_dir" ;
@@ -68,11 +72,12 @@ if(-e "$modules/$module_name" || -e "tests/$test_name") {
 # create module
 print "Creating module $module_name in $modules\n";
 do_template($module_tmpl,$modules,$module_name);
-
+do_git("$modules/$module_name");
 
 # create test
 print "Creating test $test_name in $tests\n";
 do_template($test_tmpl,$tests,$test_name);
+do_git("$tests/$test_name");
 
 
 
@@ -121,10 +126,11 @@ sub do_template {
     close(FH);
 }
 
-sub do_svn {
-    my($svn_name) = @_;
-    my @args = ('svn', 'add', $svn_name);
+sub do_git {
+    my($git_name) = @_;
+    print "Adding $git_name to GIT repo";
+    my @args = ('git', 'add', $git_name);
     system(@args) == 0 
-	or die "Can't add $svn_name to SVN repository.";
+	or die "Can't add $git_name to GIT repository.";
 
 }
