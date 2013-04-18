@@ -23,6 +23,17 @@ qw(
 ) ]);
 our @EXPORT_OK   =(@{ $EXPORT_TAGS{'all'} }) ;
 
+sub gen_policy {
+  my($ast) = @_;
+
+  my $logger = get_logger();
+
+  my $o = {};
+
+  $o->{"!($do)/$do$signal"=> ["+channel{}+event{}"]};
+
+  return JSON::XS::->new->convert_blessed(1)->pretty(1)->encode($o);
+}
 
 
 1;
