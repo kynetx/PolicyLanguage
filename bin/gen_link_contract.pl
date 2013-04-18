@@ -7,11 +7,12 @@ use lib qw(..);
 use Getopt::Std;
 use Data::Dumper;
 use Pixel::Parser;
+use Pixel::LinkContract;
 
 use Log::Log4perl qw(get_logger :levels);
 Log::Log4perl->easy_init($INFO);
-#Log::Log4perl->easy_init($DEBUG);
-
+Log::Log4perl->easy_init($DEBUG);
+my $logger = get_logger();
 
 # global options
 use vars qw/ %opt /;
@@ -36,8 +37,8 @@ my $base_var = 'PIXEL_ROOT';
 my $base = $ENV{$base_var} || die "$base_var is undefined in the environment; set it before using $0";
 
 my $ast = Pixel::Parser::parse_pixel(getfile($filename));
-my $json = Pixel::Parser::astToJson($ast);
-print $json  ;
+$logger->debug("AST: ", sub{Dumper $ast});
+print Pixel::LinkContract::gen_lc($ast);
 
 
 
@@ -50,7 +51,7 @@ usage:
 
    $0 -f pixel_file
 
-Parses a pixel file
+Generates an XDI link contract from a pixel file
 
 Options are:
 

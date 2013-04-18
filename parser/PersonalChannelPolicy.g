@@ -56,8 +56,8 @@ decl	returns [HashMap result]
 	}
 	: 	var EQUAL cloud_id
 		{
-		 decl.put("var", $var.text);
-		 decl.put("rhs", $cloud_id.text);
+		 decl.put("lhs", $var.text);
+		 decl.put("expr", $cloud_id.text);
 		 $result = decl;
 		}
 	;

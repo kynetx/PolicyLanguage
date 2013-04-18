@@ -1,0 +1,7 @@
+// multiple events on a channel with list relationship
+decls
+  my_cloud = =!234;
+  forever = =!23;
+
+policy 
+  allow cloudos:{subscribe, unsubscribe} events on channel forever if channel relationship is in [+friend, +relative];

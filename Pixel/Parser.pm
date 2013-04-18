@@ -17,6 +17,8 @@ our %EXPORT_TAGS = (all => [
 qw(
 parse_pixel
 remove_comments
+astToJson
+jsonToAst
 ) ]);
 our @EXPORT_OK   =(@{ $EXPORT_TAGS{'all'} }) ;
 
@@ -89,9 +91,9 @@ sub parse_pixel {
 
     #$pixel = remove_comments($pixel);
 
-    $logger->debug("[parser::parse_pixel] after comments: ", sub {$pixel});
+#    $logger->trace("[parser::parse_pixel] after comments: ", sub {$pixel});
     my $json = $parser->pixel($pixel);
-    $logger->debug("Result: ",$json);
+    $logger->trace("Result: ",$json);
     my $result;
     eval {
         $result = jsonToAst($json);
@@ -121,6 +123,15 @@ sub jsonToAst {
     #$logger->debug("Original string: (", ref $json,") ", $json);
     #return JSON::XS::->new->convert_blessed(1)->utf8(1)->pretty(1)->decode($json);
     return JSON::XS::->new->convert_blessed(1)->pretty(1)->decode($json);
+
+}
+
+sub astToJson {
+    my ($ast) = @_;
+    my $logger = get_logger();
+    #$logger->debug("Original string: (", ref $json,") ", $json);
+    #return JSON::XS::->new->convert_blessed(1)->utf8(1)->pretty(1)->decode($json);
+    return JSON::XS::->new->convert_blessed(1)->pretty(1)->encode($ast);
 
 }
 

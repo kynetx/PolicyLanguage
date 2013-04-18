@@ -1,6 +1,7 @@
 output
 build
 _Inline
+parser/json_java
 parser/lib
 parser/build
 parser/perl/lib
