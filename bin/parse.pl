@@ -8,6 +8,11 @@ use Getopt::Std;
 use Data::Dumper;
 use Pixel::Parser;
 
+use Log::Log4perl qw(get_logger :levels);
+Log::Log4perl->easy_init($INFO);
+#Log::Log4perl->easy_init($DEBUG);
+
+
 # global options
 use vars qw/ %opt /;
 my $opt_string = 'f:h?';
@@ -30,6 +35,9 @@ die "Don't append extension" if $filename =~ m#\.pm$#;
 my $base_var = 'PIXEL_ROOT';
 my $base = $ENV{$base_var} || die "$base_var is undefined in the environment; set it before using $0";
 
+my $ast = Pixel::Parser::parse_pixel(getfile($filename));
+my $json = JSON::XS::->new->convert_blessed(1)->pretty(1)->encode($ast);
+print $json  ;
 
 
 
