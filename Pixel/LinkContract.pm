@@ -37,7 +37,7 @@ sub gen_lc {
 
   my $o = [];
 
-  push @{ $o}, {'[$do]/$do$signal'=> ['+channel{}+event{}']};
+  push @{ $o}, gen_XDI_triple('[$do]','$do$signal','+channel{}+event{}');
 
 
   foreach my $policy_stmt (@{ $ast->{'policy'} } ) {
@@ -50,15 +50,8 @@ sub gen_lc {
     
   }
 
-  my $result = {};
-  
-  foreach my $clause (@{ $o }) {
-    foreach my $k (keys %{ $clause }) {
-      $result->{$k} = $clause->{$k}
-    }
-  }
 
-  return Pixel::Parser::astToJson($result);
+  return Pixel::Parser::astToJson(mash_hash($o));
 }
 
 sub eval_decls {
@@ -114,10 +107,21 @@ sub gen_event_filter {
 }
 
 sub gen_condition {
-  my($condition, $channel, $o) = @_;
+  my($condition, $channel) = @_;
 
   my $logger = get_logger();
   my $o = [];
+
+  my $subject_prefix = '[$do][$if][$and]';
+  my $action = '$true';
+  my $channel_subj = '+channel'.$channel.'+event{1}';
+  my $cond_id = gen_policy_id();
+  my $cond_subj = $subject_prefix.'$or'.$cond_id;
+  my $cond_obj_list = [];
+  foreach my $relationship (@{ $condition->{'relationship_list'} }) {
+    push @{ $cond_obj_list }, gen_XDI_triple($channel_subj, $relationship, ['{$from}']);
+  }
+  push @{ $o }, gen_XDI_triple($cond_subj, $action, mash_hash($cond_obj_list));
 
   return $o;
 
@@ -127,10 +131,7 @@ sub gen_XDI_triple {
   my($subj, $pred, $obj) = @_;
 
   my $sub = join('/', ($subj, $pred));
-  if (! ref $obj eq 'ARRAY') {
-    $obj = [ $obj ];
-  }
-  return {$sub => $obj};
+  return {$sub => ref $obj eq 'ARRAY' ? $obj : [$obj]};
 }
 
 sub wrap_triple {
@@ -141,6 +142,18 @@ sub wrap_triple {
 sub gen_policy_id {
   my $ug    = new Data::UUID;
   return '!.uuid.'.$ug->create_str();
+}
+
+sub mash_hash {
+  my($o) = @_;
+  my $result = {};
+  
+  foreach my $clause (@{ $o }) {
+    foreach my $k (keys %{ $clause }) {
+      $result->{$k} = $clause->{$k}
+    }
+  }
+  return $result
 }
 
 
