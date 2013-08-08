@@ -76,12 +76,12 @@ policy_stmt returns[HashMap result]
 	@init{
 		HashMap policy_stmt = new HashMap();
 	}
-	: 	cloud_id_expr? effect event_filter_expr channel_id_expr (IF  condition)?  
+	: 	cloud_id_expr? effect action resource (IF  condition)?  
         	{
 		 policy_stmt.put("cloud_id" , $cloud_id_expr.result);  
 		 policy_stmt.put("effect" , $effect.text);
-		 policy_stmt.put("channel_id" , $channel_id_expr.result);
-		 policy_stmt.put("event_filter", $event_filter_expr.result);
+		 policy_stmt.put("channel_id" , $resource.result);
+		 policy_stmt.put("event_filter", $action.result);
 		 if($condition.result != null) {
  		   policy_stmt.put("condition", $condition.result);
  		 }
@@ -90,6 +90,19 @@ policy_stmt returns[HashMap result]
 	| 	channel_id_expr BELONGS_TO cloud_id_expr	
 	;  
 		
+action returns[HashMap result]
+	: 	event_filter_expr
+		{
+		 $result = $event_filter_expr.result;
+		}
+	;
+	
+resource returns[String result]
+	: 	channel_id_expr
+		{
+		 $result = $channel_id_expr.result;
+		}
+	;
 
 condition returns[HashMap result]
 	:	relationship_expr 

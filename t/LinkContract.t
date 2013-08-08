@@ -21,7 +21,7 @@ Log::Log4perl->easy_init($INFO);
 #Log::Log4perl->easy_init($DEBUG);
 
 use Pixel::Test qw/:all/;
-use Pixel::XDI qw/:all/;
+use Pixel::LinkContract qw/:all/;
 #use Pixel::Configure qw/:all/;
 
 

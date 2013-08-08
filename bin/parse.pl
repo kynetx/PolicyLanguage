@@ -6,7 +6,10 @@ use lib qw(..);
 
 use Getopt::Std;
 use Data::Dumper;
+
+
 use Pixel::Parser;
+use Pixel::PrettyPrinter qw/:all/;
 
 use Log::Log4perl qw(get_logger :levels);
 Log::Log4perl->easy_init($INFO);
@@ -15,7 +18,7 @@ Log::Log4perl->easy_init($INFO);
 
 # global options
 use vars qw/ %opt /;
-my $opt_string = 'f:h?';
+my $opt_string = 'f:ph?';
 getopts( "$opt_string", \%opt ); # or &usage();
 &usage() if $opt{'h'} || $opt{'?'};
 
@@ -35,9 +38,20 @@ die "Don't append extension" if $filename =~ m#\.pm$#;
 my $base_var = 'PIXEL_ROOT';
 my $base = $ENV{$base_var} || die "$base_var is undefined in the environment; set it before using $0";
 
-my $ast = Pixel::Parser::parse_pixel(getfile($filename));
-my $json = Pixel::Parser::astToJson($ast);
-print $json  ;
+my $ast;
+eval {
+  $ast = Pixel::Parser::parse_pixel(getfile($filename));
+};
+if ($@) {
+  $ast->{'error'} = $@;
+}
+
+if ($opt{'p'}) { # pretty print -- round trip
+  print pp($ast);
+} else {
+  my $json = Pixel::Parser::astToJson($ast);
+  print $json  ;
+}
 
 
 

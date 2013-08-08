@@ -37,11 +37,13 @@ sub pp {
   if (defined $ast->{'decls'}) {
     $o .= "decls\n";
     $o .= join(";\n", (map {pp_decl($_)} @{ $ast->{'decls'} }));
+    $o .= ";\n";
   }
 
   if (defined $ast->{'policy'}) {
     $o .= "policy\n";
     $o .= join(";\n", (map {pp_policy_stmt($_)} @{ $ast->{'policy'} }));
+    $o .= "\n";
   }
 
   return $o;
@@ -54,10 +56,9 @@ sub pp_decl {
 
   my $o = "";
 
-  $o .= $ast->{'var'} ;
+  $o .= $ast->{'lhs'} ;
   $o .= ' = ';
-  $o .= $ast->{'rhs'};
-  $o .= ';';
+  $o .= $ast->{'expr'};
     
 
   return $o;
@@ -69,18 +70,19 @@ sub pp_policy_stmt {
 
   my $logger = get_logger();
 
-  my $o = "";
-  $o .= pp_cloud_id($ast->{'cloud_id'}) if (defined $ast->{'cloud_id'});
+  my @o = ();
 
-  $o .= pp_effect($ast->{'effect'});
+  push @o, pp_cloud_id($ast->{'cloud_id'}) if (defined $ast->{'cloud_id'});
 
-  $o .= pp_event_filter_expr($ast->{'event_filter'});
+  push @o, pp_effect($ast->{'effect'});
 
-  $o .= pp_channel_id_expr($ast->{'channel_id'});
+  push @o, pp_event_filter_expr($ast->{'event_filter'});
 
-  $o .= pp_condition($ast->{'condition'}) if (defined $ast->{'condition'});
+  push @o, pp_channel_id_expr($ast->{'channel_id'});
 
-  return $o;
+  push @o, pp_condition($ast->{'condition'}) if (defined $ast->{'condition'});
+
+  return join(" ", @o);
 }
 
 
@@ -103,7 +105,7 @@ sub pp_event_filter_expr {
   my($ast) = @_;
 
   my $logger = get_logger();
-  return pp_event_filter($ast). " events ";
+  return pp_event_filter($ast). " events";
 }
 
 sub pp_event_filter {
@@ -118,7 +120,7 @@ sub pp_event_filter {
 
   if ($ast->{'types'}) {
     if (scalar @{ $ast->{'types'} } > 1) {
-      $o .= " :{ " . join(", ", @{ $ast->{'types'} }) . " } ";
+      $o .= ":{" . join(", ", @{ $ast->{'types'} }) . "}";
     } elsif (scalar @{ $ast->{'types'} } == 1) {
       $o .= ":" . $ast->{'types'}->[0] ;
     }
@@ -131,14 +133,14 @@ sub pp_channel_id_expr {
   my($ast) = @_;
 
   my $logger = get_logger();
-  my $o = " on ";
+  my $o = "on ";
 
   if (  $ast eq 'all' 
      || $ast eq 'any' 
      ) {
-    $o .= $ast . " channel ";
+    $o .= $ast . " channel";
   } else {
-    $o .= " channel " . $ast ;
+    $o .= "channel " . $ast ;
   }
 
   return $o;
@@ -152,18 +154,18 @@ sub pp_condition {
 
   my $not = "";
   if (! $ast->{'sense'}) {
-    $not = "not";
+    $not = "not ";
   }
 
   if ($ast->{'type'} eq 'relationship_list') {
-    $o .= " channel relationship is $not in [ " . join(", ", @{ $ast->{'relationship_list'} }) . ' ] ';
+    $o .= "channel relationship is ". $not . "in [" . join(", ", @{ $ast->{'relationship_list'} }) . '] ';
   } elsif ($ast->{'type'} eq 'relationship_single') {
-    $o .= " channel relationship is $not " . $ast->{'relationship_id'} ;
+    $o .= "channel relationship is $not " . $ast->{'relationship_id'} ;
   } elsif ($ast->{'type'} eq 'attribute') {
   } elsif ($ast->{'type'} eq 'raised_by_single') {
-    $o .= " $not raised by cloud " . $ast->{'cloud_id'}
+    $o .= $not . "raised by cloud " . $ast->{'cloud_id'}
   } elsif ($ast->{'type'} eq 'raised_by_list') {
-    $o .= " $not raised by cloud in " .  " [ " . join(", ", @{ $ast->{'cloud_list'} }) . ' ] ';
+    $o .= $not . "raised by cloud in " .  "[" . join(", ", @{ $ast->{'cloud_list'} }) . '] ';
   } elsif ($ast->{'type'} eq 'raised_by_match') {
   }
 
