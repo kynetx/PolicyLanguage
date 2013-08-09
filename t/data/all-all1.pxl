@@ -1,0 +1,3 @@
+// all events on all channels
+policy 
+  allow all events on any channel
